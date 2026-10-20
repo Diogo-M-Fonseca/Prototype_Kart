@@ -931,6 +931,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 856368191}
   m_CullTransparentMesh: 1
+--- !u!1 &972996072 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7475957244665418267, guid: a708ec2aa7dafe941ac1b53fe66db652, type: 3}
+  m_PrefabInstance: {fileID: 2092593217}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &972996076
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 972996072}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2150044562243273127, guid: a708ec2aa7dafe941ac1b53fe66db652, type: 3}
 --- !u!1 &1119137291
 GameObject:
   m_ObjectHideFlags: 0
@@ -1478,14 +1505,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1514810215}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.6891244, z: -0, w: 0.7246431}
-  m_LocalPosition: {x: 13.53418, y: 1, z: 6.693871}
+  m_LocalRotation: {x: -0, y: -0.4404951, z: -0, w: 0.8977551}
+  m_LocalPosition: {x: 29.2, y: 1, z: 10.2}
   m_LocalScale: {x: 1, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 379993779}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -87.122, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -52.271, z: 0}
 --- !u!114 &1514810221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1498,14 +1525,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1338dc5ed426b3f4aac57742eb375a62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KartController
-  moveAction: {fileID: -1293373982000402901, guid: 4304bd9481638e54ba6c5f91b8974947, type: 3}
-  steerAction: {fileID: 1720122507635702772, guid: 4304bd9481638e54ba6c5f91b8974947, type: 3}
+  rb: {fileID: 0}
+  maxSpeed: 250
+  reverseSpeed: 6
   acceleration: 30
-  brakeAcceleration: 18
-  maxSpeed: 100
-  maxReverseSpeed: 5
-  turnSpeed: 100
-  minSteeringSpeed: 0.1
+  braking: 30
+  coastDrag: 5
+  turnSpeed: 250
+  fullSteerSpeed: 5
+  grip: 10
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundCheckDistance: 0.7
+  moveInput: {x: 0, y: 0}
+  forwardSpeed: 0
+  lateralSpeed: 0
+  isGrounded: 0
 --- !u!1 &1761326419
 GameObject:
   m_ObjectHideFlags: 0
@@ -1969,6 +2005,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1886559660}
   m_CullTransparentMesh: 1
+--- !u!1 &1993824974 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1378922297957006227, guid: a708ec2aa7dafe941ac1b53fe66db652, type: 3}
+  m_PrefabInstance: {fileID: 2092593217}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &1993824978
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993824974}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8634060567236447461, guid: a708ec2aa7dafe941ac1b53fe66db652, type: 3}
 --- !u!1 &2061873832
 GameObject:
   m_ObjectHideFlags: 0
@@ -2137,7 +2200,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1378922297957006227, guid: a708ec2aa7dafe941ac1b53fe66db652, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1993824978}
+    - targetCorrespondingSourceObject: {fileID: -7475957244665418267, guid: a708ec2aa7dafe941ac1b53fe66db652, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 972996076}
   m_SourcePrefab: {fileID: 100100000, guid: a708ec2aa7dafe941ac1b53fe66db652, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

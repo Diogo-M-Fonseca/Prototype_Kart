@@ -4,140 +4,117 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class KartController : MonoBehaviour
 {
-    [Header("Input Actions")]
-    [SerializeField] private InputActionReference moveAction;
-    [SerializeField] private InputActionReference steerAction;
+    [Header("Referências")]
+    [SerializeField] private Rigidbody rb;
 
-    [Header("Movement")]
-    [SerializeField] private float acceleration = 12f;
-    [SerializeField] private float brakeAcceleration = 18f;
-    [SerializeField] private float maxSpeed = 20f;
-    [SerializeField] private float maxReverseSpeed = 5f;
 
-    [Header("Steering")]
-    [SerializeField] private float turnSpeed = 100f;
-    [SerializeField] private float minSteeringSpeed = 0.1f;
+    [Header("Velocidade")]
+    [SerializeField, Min(0f)] private float maxSpeed = 20f;
+    [SerializeField, Min(0f)] private float reverseSpeed = 6f;
+    [SerializeField, Min(0f)] private float acceleration = 15f;
+    [SerializeField, Min(0f)] private float braking = 30f;
+    [SerializeField, Min(0f)] private float coastDrag = 5f;
 
-    private Rigidbody rb;
+    [Header("Direção")]
+    [SerializeField, Min(0f)] private float turnSpeed = 100f;
+    [SerializeField, Min(0.1f)] private float fullSteerSpeed = 5f;
 
-    private float moveInput;
-    private float steerInput;
+    [Header("Aderência")]
+    [SerializeField, Min(0f)] private float grip = 10f;
+
+    [Header("Chão")]
+    [SerializeField] private LayerMask groundMask = ~0;
+    [SerializeField, Min(0f)] private float groundCheckDistance = 0.7f;
+
+    [Header("Debug (só leitura)")]
+    [SerializeField] private Vector2 moveInput;
+    [SerializeField] private float forwardSpeed;
+    [SerializeField] private float lateralSpeed;
+    [SerializeField] private bool isGrounded;
+
+    private InputAction moveAction;
+
+    private void Reset()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-
-        rb.constraints |= RigidbodyConstraints.FreezeRotationX
-                        | RigidbodyConstraints.FreezeRotationZ;
+        if (rb == null) rb = GetComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
     private void OnEnable()
     {
-        moveAction.action.Enable();
-        steerAction.action.Enable();
-    }
+        if (InputSystem.actions == null)
+        {
+            Debug.LogError("InputSystem.actions é null. Ativa as Project-Wide Actions nas Project Settings.", this);
+            enabled = false;
+            return;
+        }
 
-    private void OnDisable()
-    {
-        moveAction.action.Disable();
-        steerAction.action.Disable();
+        moveAction = InputSystem.actions.FindAction("Player/Move", false);
+        if (moveAction == null)
+        {
+            Debug.LogError($"Action '{"Player/Move"}' não encontrada.", this);
+            enabled = false;
+            return;
+        }
+
+        moveAction.Enable();
     }
 
     private void Update()
     {
-        moveInput = moveAction.action.ReadValue<float>();
-        steerInput = steerAction.action.ReadValue<float>();
+        moveInput = moveAction.ReadValue<Vector2>();
     }
 
     private void FixedUpdate()
     {
-        MoveKart();
-        SteerKart();
-        LimitSpeed();
-    }
+        isGrounded = Physics.Raycast(
+        transform.position + transform.up * 0.1f,
+        -transform.up,
+        groundCheckDistance,
+        groundMask,
+        QueryTriggerInteraction.Ignore);
 
-    private void MoveKart()
-    {
-        float forwardSpeed =
-            Vector3.Dot(rb.linearVelocity, transform.forward);
+        if (!isGrounded) return;
 
-        if (moveInput > 0f)
-        {
-            if (forwardSpeed < maxSpeed)
-            {
-                rb.AddForce(
-                    transform.forward * acceleration,
-                    ForceMode.Acceleration
-                );
-            }
-        }
-        else if (moveInput < 0f)
-        {
-            if (forwardSpeed > 0.5f)
-            {
-                rb.AddForce(
-                    -transform.forward * brakeAcceleration,
-                    ForceMode.Acceleration
-                );
-            }
-            else if (forwardSpeed > -maxReverseSpeed)
-            {
-                rb.AddForce(
-                    -transform.forward * acceleration,
-                    ForceMode.Acceleration
-                );
-            }
-        }
-    }
+        float dt = Time.fixedDeltaTime
+       ;
 
-    private void SteerKart()
-    {
-        float forwardSpeed =
-            Vector3.Dot(rb.linearVelocity, transform.forward);
-
-        if (Mathf.Abs(forwardSpeed) < minSteeringSpeed)
-            return;
-
-        float speedFactor =
-            Mathf.Clamp01(Mathf.Abs(forwardSpeed) / maxSpeed);
-
-        float reverseFactor = Mathf.Sign(forwardSpeed);
-
-        float rotation =
-            steerInput * turnSpeed * speedFactor
-            * reverseFactor * Time.fixedDeltaTime;
-
-        Quaternion turnRotation =
-            Quaternion.Euler(0f, rotation, 0f);
-
-        rb.MoveRotation(rb.rotation * turnRotation);
-    }
-
-    private void LimitSpeed()
-    {
         Vector3 velocity = rb.linearVelocity;
+        Vector3 fwd = transform.forward;
+        Vector3 right = transform.right;
 
-        Vector3 horizontalVelocity =
-            new Vector3(velocity.x, 0f, velocity.z);
+        forwardSpeed = Vector3.Dot(velocity, fwd);
+        lateralSpeed = Vector3.Dot(velocity, right);
+        Vector3 other = velocity - fwd * forwardSpeed - right * lateralSpeed;
 
-        float forwardSpeed =
-            Vector3.Dot(horizontalVelocity, transform.forward);
-
-        if (forwardSpeed > maxSpeed)
+        float throttle = moveInput.y;
+        if (throttle > 0.01f)
         {
-            horizontalVelocity -=
-                transform.forward * (forwardSpeed - maxSpeed);
+            float rate = forwardSpeed < 0f ? braking : acceleration;
+            forwardSpeed = Mathf.MoveTowards(forwardSpeed, maxSpeed * throttle, rate * dt);
         }
-        else if (forwardSpeed < -maxReverseSpeed)
+        else if (throttle < -0.01f)
         {
-            horizontalVelocity -=
-                transform.forward * (forwardSpeed + maxReverseSpeed);
+            float rate = forwardSpeed > 0f ? braking : acceleration;
+            forwardSpeed = Mathf.MoveTowards(forwardSpeed, -reverseSpeed * -throttle, rate * dt);
+        }
+        else
+        {
+            forwardSpeed = Mathf.MoveTowards(forwardSpeed, 0f, coastDrag * dt);
         }
 
-        rb.linearVelocity = new Vector3(
-            horizontalVelocity.x,
-            velocity.y,
-            horizontalVelocity.z
-        );
+        lateralSpeed = Mathf.MoveTowards(lateralSpeed, 0f, grip * Mathf.Max(Mathf.Abs(lateralSpeed), 1f) * dt);
+
+        rb.linearVelocity = fwd * forwardSpeed + right * lateralSpeed + other;
+
+        float steerFactor = Mathf.Clamp01(Mathf.Abs(forwardSpeed) / fullSteerSpeed) * Mathf.Sign(forwardSpeed);
+        float yawDegrees = moveInput.x * turnSpeed * steerFactor;
+        rb.angularVelocity = Vector3.up * (yawDegrees * Mathf.Deg2Rad);
     }
 }
