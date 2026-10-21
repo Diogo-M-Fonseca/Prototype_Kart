@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7986550400276271917}
   - component: {fileID: 6235472235776622489}
   - component: {fileID: 7329847584109400043}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fumo_Travao_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4853,6 +4853,7 @@ GameObject:
   - component: {fileID: 4826303002767657510}
   - component: {fileID: 59212111330866920}
   - component: {fileID: 8063046743161342635}
+  - component: {fileID: 3156528622065528222}
   m_Layer: 6
   m_Name: Kart
   m_TagString: Untagged
@@ -4868,7 +4869,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1324867040692499659}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.28915206, z: -0, w: 0.9572832}
+  m_LocalRotation: {x: 0, y: -0.28914875, z: 0, w: 0.9572842}
   m_LocalPosition: {x: 95.6, y: -19.3, z: 145.7}
   m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
   m_ConstrainProportionsScale: 1
@@ -4945,9 +4946,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5d0853a1cf983f4fa66bb818cad906f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KartInputReader
-  moveActionName: Player/Move
-  brakeActionName: Player/Brake
-  driftActionName: Player/Drift
+  moveActionName: Kart/Move
+  brakeActionName: Kart/Brake
+  driftActionName: Kart/Drift
   steerDeadzone: 0.05
 --- !u!114 &397410395853652410
 MonoBehaviour:
@@ -4968,7 +4969,7 @@ MonoBehaviour:
   - {fileID: 8167115277143949924}
   trackMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 183
   rayLength: 0.6
   extendedRayLength: 3
   coyoteTime: 1
@@ -5058,6 +5059,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KartController
   centerOfMassLocal: {x: 0, y: -0.3, z: 0}
+--- !u!114 &3156528622065528222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324867040692499659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f3d9aa6feb9d4c438d954cc74fa40e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KartColorizer
+  _renderers:
+  - {fileID: 136021667075704936}
+  - {fileID: 5461370991799984600}
+  _materialIndex: 0
 --- !u!1 &2489565348156541044
 GameObject:
   m_ObjectHideFlags: 0
@@ -5068,7 +5085,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2847346048880865107}
   - component: {fileID: 243087656894827352}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: VFX_Fumo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5141,7 +5158,7 @@ GameObject:
   - component: {fileID: 2577720474578619766}
   - component: {fileID: 4780429433927955312}
   - component: {fileID: 569986833515402423}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fumo_Andar_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9977,7 +9994,7 @@ GameObject:
   - component: {fileID: 2948722853046349321}
   - component: {fileID: 7539891394248237087}
   - component: {fileID: 1158048226669659540}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fumo_Andar_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14844,7 +14861,7 @@ GameObject:
   - component: {fileID: 8588018873938967944}
   - component: {fileID: 7921524199470127608}
   - component: {fileID: 1446022055550838098}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fumo_Drift_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19680,7 +19697,7 @@ GameObject:
   - component: {fileID: 2936089406328062990}
   - component: {fileID: 1609407092739491607}
   - component: {fileID: 2124109573075248498}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fumo_Drift_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24609,7 +24626,7 @@ GameObject:
   - component: {fileID: 5060786211002298053}
   - component: {fileID: 3410868106523042917}
   - component: {fileID: 3680440410428839724}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fumo_Travao_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29535,6 +29552,11 @@ PrefabInstance:
       addedObject: {fileID: 8167115277143949924}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b35463670ef95f7449ee8713aa38b5ab, type: 3}
+--- !u!23 &136021667075704936 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8442510506162454399, guid: b35463670ef95f7449ee8713aa38b5ab, type: 3}
+  m_PrefabInstance: {fileID: 8415798817321727767}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2282007592506033468 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1485697770100870613, guid: b35463670ef95f7449ee8713aa38b5ab, type: 3}
@@ -29543,6 +29565,11 @@ Transform:
 --- !u!4 &4757516548070483211 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3948799767036138012, guid: b35463670ef95f7449ee8713aa38b5ab, type: 3}
+  m_PrefabInstance: {fileID: 8415798817321727767}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5461370991799984600 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4683669308469848369, guid: b35463670ef95f7449ee8713aa38b5ab, type: 3}
   m_PrefabInstance: {fileID: 8415798817321727767}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &6877217737570590742 stripped
