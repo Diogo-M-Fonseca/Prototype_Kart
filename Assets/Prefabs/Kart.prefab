@@ -4969,7 +4969,7 @@ MonoBehaviour:
   - {fileID: 8167115277143949924}
   trackMask:
     serializedVersion: 2
-    m_Bits: 4294967231
+    m_Bits: 128
   rayLength: 0.6
   extendedRayLength: 3
   coyoteTime: 1
@@ -5074,7 +5074,7 @@ MonoBehaviour:
   _renderers:
   - {fileID: 136021667075704936}
   - {fileID: 5461370991799984600}
-  _materialIndex: 0
+  _materialIndex: 1
 --- !u!1 &2489565348156541044
 GameObject:
   m_ObjectHideFlags: 0
