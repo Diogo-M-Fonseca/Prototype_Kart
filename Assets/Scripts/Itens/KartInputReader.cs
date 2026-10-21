@@ -7,6 +7,7 @@ public class KartInputReader : MonoBehaviour
     [SerializeField] private string moveActionName = "Kart/Move";
     [SerializeField] private string brakeActionName = "Kart/Brake";
     [SerializeField] private string driftActionName = "Kart/Drift";
+    [SerializeField] private string itemActionName = "Kart/Attack";
 
     [Header("Ajustes")]
     [SerializeField, Range(0f, 0.5f)] private float steerDeadzone = 0.05f;
@@ -14,6 +15,7 @@ public class KartInputReader : MonoBehaviour
     private InputAction moveAction;
     private InputAction brakeAction;
     private InputAction driftAction;
+    private InputAction itemAction;
 
     public float Steer
     {
@@ -27,6 +29,7 @@ public class KartInputReader : MonoBehaviour
     public float Throttle => ReadMove().y;
     public bool Brake => brakeAction != null && brakeAction.IsPressed();
     public bool Drift => driftAction != null && driftAction.IsPressed();
+    public bool UseItemPressed => itemAction != null && itemAction.WasPressedThisFrame();
 
     private void Awake()
     {
@@ -34,7 +37,7 @@ public class KartInputReader : MonoBehaviour
 
         if (actions == null)
         {
-            Debug.LogError("Não há Project-wide Actions definidas em Project Settings > Input System Package.", this);
+            Debug.LogError("Nï¿½o hï¿½ Project-wide Actions definidas em Project Settings > Input System Package.", this);
             return;
         }
 
@@ -46,6 +49,7 @@ public class KartInputReader : MonoBehaviour
         moveAction = Find(actions, moveActionName);
         brakeAction = Find(actions, brakeActionName);
         driftAction = Find(actions, driftActionName);
+        itemAction = Find(actions, itemActionName);
     }
 
     private Vector2 ReadMove() => moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
@@ -55,7 +59,7 @@ public class KartInputReader : MonoBehaviour
         InputAction action = actions.FindAction(actionName);
 
         if (action == null)
-            Debug.LogWarning($"Action \"{actionName}\" não encontrada nas Project-wide Actions.", this);
+            Debug.LogWarning($"Action \"{actionName}\" nï¿½o encontrada nas Project-wide Actions.", this);
 
         return action;
     }
