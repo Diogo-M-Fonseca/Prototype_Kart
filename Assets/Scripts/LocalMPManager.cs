@@ -6,14 +6,12 @@ public class LocalMPManager : MonoBehaviour
 {
     [Header("Prefabs")]
     [SerializeField] private KartController _kartPrefab;
-    [Tooltip("Prefab com Camera + KartCamera (+ AudioListener).")]
     [SerializeField] private KartCamera _cameraPrefab;
 
     [Header("Spawn")]
     [SerializeField] private Transform[] _spawnPoints;
 
     [Header("Testes")]
-    [Tooltip("Permite carregar a cena diretamente (sem lobby) com um jogador.")]
     [SerializeField] private bool _fallbackWithoutLobby = true;
 
     private readonly List<InputActionAsset> _playerActions = new List<InputActionAsset>();
@@ -87,6 +85,16 @@ public class LocalMPManager : MonoBehaviour
 
         Camera cam = kartCamera.GetComponent<Camera>();
         cam.rect = GetViewport(index, playerCount);
+
+        if (RaceManager.Instance != null)
+        {
+            if (!kart.TryGetComponent(out KartRacer racer))
+            {
+                racer = kart.gameObject.AddComponent<KartRacer>();
+            }
+
+            RaceManager.Instance.Register(racer, index, LocalMPSession.GetPlayerColor(index), kartCamera, cam.rect);
+        }
 
         AudioListener listener = kartCamera.GetComponent<AudioListener>();
         if (listener != null)
