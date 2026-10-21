@@ -30,6 +30,12 @@ public class KartCamera : MonoBehaviour
         SnapToTarget();
     }
 
+    public void SetTarget(Rigidbody newTarget)
+    {
+        target = newTarget;
+        SnapToTarget();
+    }
+
     public void SnapToTarget()
     {
         if (target == null)
@@ -84,10 +90,14 @@ public class KartCamera : MonoBehaviour
                            && !(ignoreReverse && movingBackwards);
 
         if (useVelocity)
+        {
             return flatVelocity.normalized;
+        }
 
         if (flatForward.sqrMagnitude > 1e-3f)
+        {
             return flatForward.normalized;
+        }
 
         return heading;
     }

@@ -38,6 +38,11 @@ public class KartInputReader : MonoBehaviour
             return;
         }
 
+        BindActions(actions);
+    }
+
+    public void BindActions(InputActionAsset actions)
+    {
         moveAction = Find(actions, moveActionName);
         brakeAction = Find(actions, brakeActionName);
         driftAction = Find(actions, driftActionName);
