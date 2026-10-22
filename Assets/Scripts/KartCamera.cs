@@ -24,16 +24,29 @@ public class KartCamera : MonoBehaviour
     private Vector3 pivot;
     private float yaw;
     private float yawVelocity;
+    private KartController targetKart;
 
     private void Start()
     {
+        CacheTargetKart();
         SnapToTarget();
     }
 
     public void SetTarget(Rigidbody newTarget)
     {
         target = newTarget;
+        CacheTargetKart();
         SnapToTarget();
+    }
+
+    private void CacheTargetKart()
+    {
+        targetKart = null;
+
+        if (target != null)
+        {
+            target.TryGetComponent(out targetKart);
+        }
     }
 
     public void SnapToTarget()
@@ -80,6 +93,11 @@ public class KartCamera : MonoBehaviour
 
     private Vector3 ReadHeading()
     {
+        if (targetKart != null && targetKart.IsStunned)
+        {
+            return heading;
+        }
+
         Vector3 velocity = target.linearVelocity;
         Vector3 flatVelocity = Vector3.ProjectOnPlane(velocity, Vector3.up);
         Vector3 kartForward = target.transform.forward;

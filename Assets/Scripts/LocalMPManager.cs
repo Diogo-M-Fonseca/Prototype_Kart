@@ -57,7 +57,7 @@ public class LocalMPManager : MonoBehaviour
     {
         if (_kartPrefab == null || _cameraPrefab == null || _spawnPoints == null || _spawnPoints.Length == 0)
         {
-            Debug.LogError("LocalMPManager não está configurado (prefabs ou pontos de spawn em falta).", this);
+            Debug.LogError("LocalMPManager não esta configurado (prefabs ou pontos de spawn em falta).", this);
             return;
         }
 
@@ -65,11 +65,24 @@ public class LocalMPManager : MonoBehaviour
         KartController kart = Instantiate(_kartPrefab, spawn.position, spawn.rotation);
 
         InputActionAsset actions = Instantiate(InputSystem.actions);
-        actions.devices = device != null ? new InputDevice[] { device } : null;
+        bool keyboardPlayer = device == null || device is Keyboard;
+
+        if (device == null)
+        {
+            actions.devices = null;
+        }
+        else if (device is Keyboard && Mouse.current != null)
+        {
+            actions.devices = new InputDevice[] { device, Mouse.current };
+        }
+        else
+        {
+            actions.devices = new InputDevice[] { device };
+        }
         actions.Enable();
         _playerActions.Add(actions);
 
-        kart.GetComponent<KartInputReader>().BindActions(actions);
+        kart.GetComponent<KartInputReader>().BindActions(actions, keyboardPlayer);
 
         if (kart.TryGetComponent(out KartColorizer colorizer))
         {

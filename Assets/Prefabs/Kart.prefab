@@ -4955,7 +4955,6 @@ MonoBehaviour:
   trackMask:
     serializedVersion: 2
     m_Bits: 128
-    m_Bits: 183
   rayLength: 0.6
   extendedRayLength: 3
   coyoteTime: 1
@@ -5045,6 +5044,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KartController
   centerOfMassLocal: {x: 0, y: -0.3, z: 0}
+  stunInvulnerability: 1
 --- !u!114 &3156528622065528222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5061,7 +5061,9 @@ MonoBehaviour:
   - {fileID: 136021667075704936}
   - {fileID: 5461370991799984600}
   _materialIndex: 1
-  _materialIndex: 0
+  _useDecorationColor: 0
+  _decorationPlayer: 0
+  _customColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &4023261899297700743
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -97,15 +97,21 @@ public class RaceManager : MonoBehaviour
 
         racer.Init(playerIndex, color, 1);
 
+        if (!racer.TryGetComponent(out KartItemHolder itemHolder))
+        {
+            itemHolder = racer.gameObject.AddComponent<KartItemHolder>();
+        }
+
         RacerHud hud = _huds != null && playerIndex < _huds.Length ? _huds[playerIndex] : null;
 
         if (hud != null)
         {
             hud.Bind(viewport, color);
+            hud.BindItems(itemHolder);
         }
         else if (!_warnedMissingHud)
         {
-            Debug.LogWarning("RaceManager: falta o HUD de um jogador. Usa \"Criar / atualizar RaceManager\" no tool de setup para criar o canvas na cena.", this);
+            Debug.LogWarning("RaceManager: falta o HUD de um jogador.", this);
             _warnedMissingHud = true;
         }
 

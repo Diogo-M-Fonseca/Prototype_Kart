@@ -28,9 +28,8 @@ public class RocketProjectile : MonoBehaviour
     [SerializeField, Min(0.1f)] private float _lifetime = 12f;
     [SerializeField, Min(0.1f)] private float _noTargetLifetime = 3f;
     [SerializeField, Min(0f)] private float _ownerImmunityTime = 0.4f;
-    [SerializeField, Range(0f, 1f)] private float _hitSpeedMultiplier = 0.25f;
-    [SerializeField, Min(0f)] private float _hitUpImpulse = 6f;
-    [SerializeField, Min(0f)] private float _hitSpin = 8f;
+    [SerializeField, Min(0f)] private float _stunDuration = 1.5f;
+    [SerializeField, Min(0f)] private float _stunSpinTurns = 2f;
 
     private readonly List<Vector3> _route = new List<Vector3>(32);
     private readonly Vector3[] _corners = new Vector3[MaxCorners];
@@ -52,7 +51,7 @@ public class RocketProjectile : MonoBehaviour
         root.transform.SetPositionAndRotation(position, rotation);
 
         GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        Destroy(visual.GetComponent<Collider>());
+        DestroyImmediate(visual.GetComponent<Collider>());
         visual.transform.SetParent(root.transform, false);
         visual.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
         visual.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
@@ -131,8 +130,6 @@ public class RocketProjectile : MonoBehaviour
         return _target != null && _target.gameObject.activeInHierarchy && !_target.Finished;
     }
 
-    // ------------------------------------------------------------------ movimento
-
     private void Move(float dt, bool hasTarget)
     {
         Vector3 position = _body.position;
@@ -184,12 +181,9 @@ public class RocketProjectile : MonoBehaviour
 
             _routeIndex++;
         }
-
-        // Sem pontos (caminho invalido ou ja percorrido): linha reta.
         return _target.transform.position;
     }
 
-    // ------------------------------------------------------------------ caminho
 
     private void Repath()
     {
@@ -210,7 +204,6 @@ public class RocketProjectile : MonoBehaviour
 
         int count = _path.GetCornersNonAlloc(_corners);
 
-        // corners[0] e o ponto de partida, por isso comecamos em 1.
         for (int i = 1; i < count; i++)
         {
             _route.Add(_corners[i]);
@@ -246,8 +239,6 @@ public class RocketProjectile : MonoBehaviour
             if (TryFindBlocker(racers, from, direction, length, travelled, out Vector3 blocker)
                 && TryBuildDetour(from, direction, blocker, out Vector3 detour))
             {
-                // O desvio entra antes de "to"
-                // a proxima iteracao verifica detour -> to.
 
                 _route.Insert(i, detour);
                 detours++;
@@ -272,7 +263,6 @@ public class RocketProjectile : MonoBehaviour
                 continue;
             }
 
-            // Posicao prevista do kart quando o foguete la chegar.
             Vector3 position = racer.transform.position;
             Rigidbody body = racer.Body != null ? racer.Body : racer.GetComponent<Rigidbody>();
 
@@ -312,9 +302,8 @@ public class RocketProjectile : MonoBehaviour
     private bool TryBuildDetour(Vector3 from, Vector3 direction, Vector3 blocker, out Vector3 detour)
     {
         Vector3 right = Vector3.Cross(Vector3.up, direction);
-        float side = Vector3.Dot(blocker - from, right) >= 0f ? -1f : 1f; // desvia para o lado oposto ao kart
+        float side = Vector3.Dot(blocker - from, right) >= 0f ? -1f : 1f;
 
-        // Tenta primeiro o lado oposto ao kart; se nao houver pista, tenta o outro.
         for (int attempt = 0; attempt < 2; attempt++, side = -side)
         {
             Vector3 candidate = blocker + right * (side * (_avoidRadius + _avoidMargin));
@@ -328,13 +317,11 @@ public class RocketProjectile : MonoBehaviour
             Vector3 gap = hit.position - blocker;
             gap.y = 0f;
 
-            // O ponto foi "empurrado" para junto do kart (pista estreita): nao serve.
             if (gap.magnitude < _avoidRadius * 0.8f)
             {
                 continue;
             }
 
-            // Tem de ser possivel chegar la sem sair do NavMesh.
             if (NavMesh.Raycast(from, hit.position, out _, _areaMask))
             {
                 continue;
@@ -348,7 +335,6 @@ public class RocketProjectile : MonoBehaviour
         return false;
     }
 
-    // ------------------------------------------------------------------ impacto
 
     private void OnTriggerEnter(Collider other)
     {
@@ -371,13 +357,9 @@ public class RocketProjectile : MonoBehaviour
     {
         _consumed = true;
 
-        Rigidbody body = racer.Body != null ? racer.Body : racer.GetComponent<Rigidbody>();
-
-        if (body != null)
+        if (racer.TryGetComponent(out KartController kart))
         {
-            body.linearVelocity *= _hitSpeedMultiplier;
-            body.AddForce(Vector3.up * _hitUpImpulse, ForceMode.VelocityChange);
-            body.AddTorque(Vector3.up * _hitSpin, ForceMode.VelocityChange);
+            kart.Stun(_stunDuration, _stunSpinTurns);
         }
 
         Destroy(gameObject);

@@ -13,6 +13,9 @@ public class RacerHud : MonoBehaviour
     [SerializeField] private TMP_Text _rowsLabel;
     [SerializeField] private GameObject _exitHint;
 
+    [Header("Item (criado pelo tool Tools/Kart/Itens e HUD)")]
+    [SerializeField] private KartItemHud _itemHud;
+
     [Header("Cor do jogador")]
     [SerializeField] private bool _tintPosition = true;
     [SerializeField] private bool _tintTitle = true;
@@ -49,11 +52,20 @@ public class RacerHud : MonoBehaviour
         SetActive(_resultsPanel, false);
     }
 
+    public void BindItems(KartItemHolder holder)
+    {
+        if (_itemHud != null)
+        {
+            _itemHud.Bind(holder);
+        }
+    }
+
     public void ShowRacing(string lap, string position)
     {
         SetActive(_resultsPanel, false);
         SetActive(_lapLabel, true);
         SetActive(_positionLabel, true);
+        SetActive(_itemHud, true);
 
         SetText(_lapLabel, ref _lapText, lap);
         SetText(_positionLabel, ref _positionText, position);
@@ -63,6 +75,7 @@ public class RacerHud : MonoBehaviour
     {
         SetActive(_lapLabel, false);
         SetActive(_positionLabel, false);
+        SetActive(_itemHud, false);
         SetActive(_resultsPanel, true);
         SetActive(_exitHint, showExitHint);
 

@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: RocketItem
   m_EditorClassIdentifier: Assembly-CSharp::RocketItem
   _displayName: Item
+  _iconPrefab: {fileID: 7153390297782048074, guid: 4192917a99e0ed440a3293f762248989, type: 3}
   _icon: {fileID: 0}
-  _rocketPrefab: {fileID: 0}
+  _rocketPrefab: {fileID: 7940990910447772553, guid: 4192917a99e0ed440a3293f762248989, type: 3}
   _spawnDistance: 2.5
   _spawnHeight: 0.7
