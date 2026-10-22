@@ -203,6 +203,12 @@ MonoBehaviour:
   _lookAheadDistance: 35
   _maxPredictTime: 1.5
   _maxDetoursPerRepath: 3
+  _fireClip: {fileID: 8300000, guid: 58cf6c310e147df469347d1174d6d973, type: 3}
+  _flightLoopClip: {fileID: 8300000, guid: 7809c377901c7b042b7b3bc720cee612, type: 3}
+  _explosionClip: {fileID: 8300000, guid: 8e5f96096ab01ff43bda3f64f96e2b57, type: 3}
+  _volume: 1
+  _spatialBlend: 1
+  _audioMaxDistance: 200
   _lifetime: 12
   _noTargetLifetime: 3
   _ownerImmunityTime: 0.4

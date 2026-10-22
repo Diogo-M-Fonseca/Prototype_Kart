@@ -24,6 +24,16 @@ public class RocketProjectile : MonoBehaviour
     [SerializeField, Min(0f)] private float _maxPredictTime = 1.5f;
     [SerializeField, Min(1)] private int _maxDetoursPerRepath = 3;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip _fireClip;
+    [Tooltip("Tocado em loop enquanto o foguete viaja.")]
+    [SerializeField] private AudioClip _flightLoopClip;
+    [SerializeField] private AudioClip _explosionClip;
+    [SerializeField, Range(0f, 1f)] private float _volume = 1f;
+    [Tooltip("0 = som 2D, 1 = totalmente 3D (volume baixa com a distancia).")]
+    [SerializeField, Range(0f, 1f)] private float _spatialBlend = 1f;
+    [SerializeField, Min(1f)] private float _audioMaxDistance = 60f;
+
     [Header("Vida e impacto")]
     [SerializeField, Min(0.1f)] private float _lifetime = 12f;
     [SerializeField, Min(0.1f)] private float _noTargetLifetime = 3f;
@@ -45,6 +55,9 @@ public class RocketProjectile : MonoBehaviour
     private float _groundY;
     private bool _launched;
     private bool _consumed;
+
+    private AudioSource _loopSource;
+    private AudioSource _sfxSource;
 
     public static RocketProjectile CreateDefault(Vector3 position, Quaternion rotation)
     {
@@ -83,7 +96,10 @@ public class RocketProjectile : MonoBehaviour
         }
 
         col.isTrigger = true;
+
+        SetupAudio();
     }
+
     public void Launch(KartRacer owner, KartRacer target)
     {
         _owner = owner;
@@ -92,6 +108,67 @@ public class RocketProjectile : MonoBehaviour
         _repathTimer = 0f;
         _age = 0f;
         _launched = true;
+
+        if (_fireClip != null)
+        {
+            _sfxSource.PlayOneShot(_fireClip);
+        }
+
+        if (_flightLoopClip != null)
+        {
+            _loopSource.clip = _flightLoopClip;
+            _loopSource.Play();
+        }
+    }
+
+    // ------------------------------------------------------------------ audio
+
+    // Duas fontes no proprio foguete: uma para o loop do trajeto e outra para
+    // os sons curtos (disparo e explosao), para parar o loop sem cortar a explosao.
+    private void SetupAudio()
+    {
+        _loopSource = CreateSource(true);
+        _sfxSource = CreateSource(false);
+    }
+
+    private AudioSource CreateSource(bool loop)
+    {
+        AudioSource source = gameObject.AddComponent<AudioSource>();
+        source.playOnAwake = false;
+        source.loop = loop;
+        source.volume = _volume;
+        source.spatialBlend = _spatialBlend;
+        source.rolloffMode = AudioRolloffMode.Linear;
+        source.minDistance = 5f;
+        source.maxDistance = _audioMaxDistance;
+        return source;
+    }
+
+    // O foguete explode: esconde-se e desativa colisoes, para o loop, toca a
+    // explosao na sua propria fonte e so se destroi quando o som acabar.
+    private void Explode()
+    {
+        _loopSource.Stop();
+
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            r.enabled = false;
+        }
+
+        foreach (Collider c in GetComponentsInChildren<Collider>())
+        {
+            c.enabled = false;
+        }
+
+        float delay = 0f;
+
+        if (_explosionClip != null)
+        {
+            _sfxSource.PlayOneShot(_explosionClip);
+            delay = _explosionClip.length + 0.1f;
+        }
+
+        Destroy(gameObject, delay);
     }
 
     private void FixedUpdate()
@@ -380,6 +457,6 @@ public class RocketProjectile : MonoBehaviour
             body.AddTorque(Vector3.up * _hitSpin, ForceMode.VelocityChange);
         }
 
-        Destroy(gameObject);
+        Explode();
     }
 }
