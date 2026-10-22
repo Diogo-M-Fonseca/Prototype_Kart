@@ -4853,10 +4853,10 @@ GameObject:
   - component: {fileID: 59212111330866920}
   - component: {fileID: 8063046743161342635}
   - component: {fileID: 3156528622065528222}
-  - component: {fileID: 4023261899297700743}
   - component: {fileID: 225960167602379109}
   - component: {fileID: 4874660321898387704}
   - component: {fileID: 5612709086621652374}
+  - component: {fileID: 4023261899297700743}
   m_Layer: 6
   m_Name: Kart
   m_TagString: Untagged
@@ -4956,7 +4956,7 @@ MonoBehaviour:
   - {fileID: 8167115277143949924}
   trackMask:
     serializedVersion: 2
-    m_Bits: 183
+    m_Bits: 128
   rayLength: 0.6
   extendedRayLength: 3
   coyoteTime: 1
@@ -5046,6 +5046,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KartController
   centerOfMassLocal: {x: 0, y: -0.3, z: 0}
+  stunInvulnerability: 1
 --- !u!114 &3156528622065528222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5061,24 +5062,10 @@ MonoBehaviour:
   _renderers:
   - {fileID: 136021667075704936}
   - {fileID: 5461370991799984600}
-  _materialIndex: 0
---- !u!114 &4023261899297700743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324867040692499659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 521615e256e1d014a9406cf9007f772b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KartInputReader
-  moveActionName: Kart/Move
-  brakeActionName: Kart/Brake
-  driftActionName: Kart/Drift
-  itemActionName: Kart/Attack
-  steerDeadzone: 0.05
+  _materialIndex: 1
+  _useDecorationColor: 0
+  _decorationPlayer: 0
+  _customColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &225960167602379109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5091,8 +5078,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1431a6cba98fd8e4bad2370aa4b8b0f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KartItemHolder
-  _startingItems:
-  - {fileID: 11400000, guid: c8d63e7d0f9362c4b853d0a7f9ed7986, type: 2}
+  _startingItems: []
 --- !u!82 &4874660321898387704
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5239,6 +5225,23 @@ MonoBehaviour:
   pitchSharpness: 6
   volumeSharpness: 8
   spatialBlend: 0
+--- !u!114 &4023261899297700743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324867040692499659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f11b28d0a0e7b7488763e9c97e3ad1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KartInputReader
+  moveActionName: Kart/Move
+  brakeActionName: Kart/Brake
+  driftActionName: Kart/Drift
+  itemActionName: Kart/Attack
+  steerDeadzone: 0.05
 --- !u!1 &2489565348156541044
 GameObject:
   m_ObjectHideFlags: 0

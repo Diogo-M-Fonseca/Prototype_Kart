@@ -24,23 +24,12 @@ public class RocketProjectile : MonoBehaviour
     [SerializeField, Min(0f)] private float _maxPredictTime = 1.5f;
     [SerializeField, Min(1)] private int _maxDetoursPerRepath = 3;
 
-    [Header("Audio")]
-    [SerializeField] private AudioClip _fireClip;
-    [Tooltip("Tocado em loop enquanto o foguete viaja.")]
-    [SerializeField] private AudioClip _flightLoopClip;
-    [SerializeField] private AudioClip _explosionClip;
-    [SerializeField, Range(0f, 1f)] private float _volume = 1f;
-    [Tooltip("0 = som 2D, 1 = totalmente 3D (volume baixa com a distancia).")]
-    [SerializeField, Range(0f, 1f)] private float _spatialBlend = 1f;
-    [SerializeField, Min(1f)] private float _audioMaxDistance = 60f;
-
     [Header("Vida e impacto")]
     [SerializeField, Min(0.1f)] private float _lifetime = 12f;
     [SerializeField, Min(0.1f)] private float _noTargetLifetime = 3f;
     [SerializeField, Min(0f)] private float _ownerImmunityTime = 0.4f;
-    [SerializeField, Range(0f, 1f)] private float _hitSpeedMultiplier = 0.25f;
-    [SerializeField, Min(0f)] private float _hitUpImpulse = 6f;
-    [SerializeField, Min(0f)] private float _hitSpin = 8f;
+    [SerializeField, Min(0f)] private float _stunDuration = 1.5f;
+    [SerializeField, Min(0f)] private float _stunSpinTurns = 2f;
 
     private readonly List<Vector3> _route = new List<Vector3>(32);
     private readonly Vector3[] _corners = new Vector3[MaxCorners];
@@ -55,9 +44,6 @@ public class RocketProjectile : MonoBehaviour
     private float _groundY;
     private bool _launched;
     private bool _consumed;
-
-    private AudioSource _loopSource;
-    private AudioSource _sfxSource;
 
     public static RocketProjectile CreateDefault(Vector3 position, Quaternion rotation)
     {
@@ -96,10 +82,7 @@ public class RocketProjectile : MonoBehaviour
         }
 
         col.isTrigger = true;
-
-        SetupAudio();
     }
-
     public void Launch(KartRacer owner, KartRacer target)
     {
         _owner = owner;
@@ -108,67 +91,6 @@ public class RocketProjectile : MonoBehaviour
         _repathTimer = 0f;
         _age = 0f;
         _launched = true;
-
-        if (_fireClip != null)
-        {
-            _sfxSource.PlayOneShot(_fireClip);
-        }
-
-        if (_flightLoopClip != null)
-        {
-            _loopSource.clip = _flightLoopClip;
-            _loopSource.Play();
-        }
-    }
-
-    // ------------------------------------------------------------------ audio
-
-    // Duas fontes no proprio foguete: uma para o loop do trajeto e outra para
-    // os sons curtos (disparo e explosao), para parar o loop sem cortar a explosao.
-    private void SetupAudio()
-    {
-        _loopSource = CreateSource(true);
-        _sfxSource = CreateSource(false);
-    }
-
-    private AudioSource CreateSource(bool loop)
-    {
-        AudioSource source = gameObject.AddComponent<AudioSource>();
-        source.playOnAwake = false;
-        source.loop = loop;
-        source.volume = _volume;
-        source.spatialBlend = _spatialBlend;
-        source.rolloffMode = AudioRolloffMode.Linear;
-        source.minDistance = 5f;
-        source.maxDistance = _audioMaxDistance;
-        return source;
-    }
-
-    // O foguete explode: esconde-se e desativa colisoes, para o loop, toca a
-    // explosao na sua propria fonte e so se destroi quando o som acabar.
-    private void Explode()
-    {
-        _loopSource.Stop();
-
-        foreach (Renderer r in GetComponentsInChildren<Renderer>())
-        {
-            r.enabled = false;
-        }
-
-        foreach (Collider c in GetComponentsInChildren<Collider>())
-        {
-            c.enabled = false;
-        }
-
-        float delay = 0f;
-
-        if (_explosionClip != null)
-        {
-            _sfxSource.PlayOneShot(_explosionClip);
-            delay = _explosionClip.length + 0.1f;
-        }
-
-        Destroy(gameObject, delay);
     }
 
     private void FixedUpdate()
@@ -208,7 +130,6 @@ public class RocketProjectile : MonoBehaviour
         return _target != null && _target.gameObject.activeInHierarchy && !_target.Finished;
     }
 
-    // ------------------------------------------------------------------ movimento
 
     private void Move(float dt, bool hasTarget)
     {
@@ -262,11 +183,8 @@ public class RocketProjectile : MonoBehaviour
             _routeIndex++;
         }
 
-        // Sem pontos (caminho invalido ou ja percorrido): linha reta.
         return _target.transform.position;
     }
-
-    // ------------------------------------------------------------------ caminho
 
     private void Repath()
     {
@@ -287,7 +205,6 @@ public class RocketProjectile : MonoBehaviour
 
         int count = _path.GetCornersNonAlloc(_corners);
 
-        // corners[0] e o ponto de partida, por isso comecamos em 1.
         for (int i = 1; i < count; i++)
         {
             _route.Add(_corners[i]);
@@ -323,8 +240,6 @@ public class RocketProjectile : MonoBehaviour
             if (TryFindBlocker(racers, from, direction, length, travelled, out Vector3 blocker)
                 && TryBuildDetour(from, direction, blocker, out Vector3 detour))
             {
-                // O desvio entra antes de "to"
-                // a proxima iteracao verifica detour -> to.
 
                 _route.Insert(i, detour);
                 detours++;
@@ -349,7 +264,6 @@ public class RocketProjectile : MonoBehaviour
                 continue;
             }
 
-            // Posicao prevista do kart quando o foguete la chegar.
             Vector3 position = racer.transform.position;
             Rigidbody body = racer.Body != null ? racer.Body : racer.GetComponent<Rigidbody>();
 
@@ -389,9 +303,8 @@ public class RocketProjectile : MonoBehaviour
     private bool TryBuildDetour(Vector3 from, Vector3 direction, Vector3 blocker, out Vector3 detour)
     {
         Vector3 right = Vector3.Cross(Vector3.up, direction);
-        float side = Vector3.Dot(blocker - from, right) >= 0f ? -1f : 1f; // desvia para o lado oposto ao kart
+        float side = Vector3.Dot(blocker - from, right) >= 0f ? -1f : 1f;
 
-        // Tenta primeiro o lado oposto ao kart; se nao houver pista, tenta o outro.
         for (int attempt = 0; attempt < 2; attempt++, side = -side)
         {
             Vector3 candidate = blocker + right * (side * (_avoidRadius + _avoidMargin));
@@ -405,13 +318,11 @@ public class RocketProjectile : MonoBehaviour
             Vector3 gap = hit.position - blocker;
             gap.y = 0f;
 
-            // O ponto foi "empurrado" para junto do kart (pista estreita): nao serve.
             if (gap.magnitude < _avoidRadius * 0.8f)
             {
                 continue;
             }
 
-            // Tem de ser possivel chegar la sem sair do NavMesh.
             if (NavMesh.Raycast(from, hit.position, out _, _areaMask))
             {
                 continue;
@@ -424,8 +335,6 @@ public class RocketProjectile : MonoBehaviour
         detour = default;
         return false;
     }
-
-    // ------------------------------------------------------------------ impacto
 
     private void OnTriggerEnter(Collider other)
     {
@@ -448,15 +357,11 @@ public class RocketProjectile : MonoBehaviour
     {
         _consumed = true;
 
-        Rigidbody body = racer.Body != null ? racer.Body : racer.GetComponent<Rigidbody>();
-
-        if (body != null)
+        if (racer.TryGetComponent(out KartController kart))
         {
-            body.linearVelocity *= _hitSpeedMultiplier;
-            body.AddForce(Vector3.up * _hitUpImpulse, ForceMode.VelocityChange);
-            body.AddTorque(Vector3.up * _hitSpin, ForceMode.VelocityChange);
+            kart.Stun(_stunDuration, _stunSpinTurns);
         }
 
-        Explode();
+        Destroy(gameObject);
     }
 }

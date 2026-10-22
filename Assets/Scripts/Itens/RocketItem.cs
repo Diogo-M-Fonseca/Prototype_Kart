@@ -4,10 +4,29 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Kart/Items/Rocket", fileName = "RocketItem")]
 public class RocketItem : KartItem
 {
-    [Tooltip("Opcional. Se vazio, e criado um foguete simples (capsula) em runtime.")]
     [SerializeField] private RocketProjectile _rocketPrefab;
     [SerializeField, Min(0f)] private float _spawnDistance = 2.5f;
     [SerializeField, Min(0f)] private float _spawnHeight = 0.7f;
+
+    public override GameObject IconPrefab
+    {
+        get
+        {
+            GameObject own = base.IconPrefab;
+
+            if (own != null)
+            {
+                return own;
+            }
+
+            return _rocketPrefab != null ? _rocketPrefab.gameObject : null;
+        }
+    }
+
+    public override GameObject CreateFallbackModel()
+    {
+        return RocketProjectile.CreateDefault(Vector3.zero, Quaternion.identity).gameObject;
+    }
 
     public override void Use(KartItemHolder holder)
     {
