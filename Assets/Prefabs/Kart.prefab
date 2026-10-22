@@ -5093,8 +5093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1431a6cba98fd8e4bad2370aa4b8b0f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KartItemHolder
-  _startingItems:
-  - {fileID: 11400000, guid: c8d63e7d0f9362c4b853d0a7f9ed7986, type: 2}
+  _startingItems: []
 --- !u!1 &2489565348156541044
 GameObject:
   m_ObjectHideFlags: 0
